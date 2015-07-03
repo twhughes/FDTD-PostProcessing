@@ -1,4 +1,5 @@
 import os
+from subprocess import call
 
 #define some convenience variables and functions
 
@@ -78,7 +79,7 @@ for L in Ls:
     
     
     #open input file to write to
-    f = open('test.txt', 'w')
+    f = open('input.txt', 'w')
 
   # TEST: 3D simulation of a linear antenna
     inputString = """
@@ -264,10 +265,10 @@ for L in Ls:
     f.write(inputString)
     
     f.close()
-    
-    
-    
-    
+    #call(['ls ./'])
+
+    #call 'which mpirun'
+    os.system('/usr/local/bin/mpirun -n 2 /Users/twh/Documents/Fan/FDTD_PLUS/maxwell_bloch/fdtd_plus_mpi ./ input.txt 2 1 1')
     
     
     
