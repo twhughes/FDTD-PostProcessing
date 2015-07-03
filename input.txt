@@ -1,0 +1,68 @@
+  # TEST: 3D simulation of a linear antenna
+
+   (Option CellParam      (CellType linear)
+                          (FieldType real)
+   )
+   (Option BoundaryParam  (Type pml pml pml) 
+                          (PmlParam (Type upml) (Size (X 0.5) (Y 0.5) (Z 0.5) )
+                          			(SigmaFactor (X 0.26) (Y 0.26) (Z 0.26) ) )
+   )
+   (Option DimensionParam (LengthScale 0.000001)
+                          (Center 0 0 0)
+                          (Resolution  0.05 0.05 0.05)
+                          (Size 3.0 3.6 4.0)
+                          (TimeParam (End 200) )
+   )
+   // To enable CheckInput, remove "\".
+   (\Option CheckInput)
+   // File will be output to structure.h5 by default.
+   (Option OutputStructure)
+   // RelPermittivity here is from effective index of  Si.
+   (Material Lossless (MaterialName metal)
+                      (MaterialToken 9)
+                      (RelPermittivity 1e30)
+                      (RelPermeability 1)
+   )
+   (Source GaussTime (SourceName Source1)
+                     (Duration 200)
+                     (Center 8)
+                     (Width 2)
+                     (Frequency 0.8333) // centered at lambda = 1/Frequency
+                     (Phase 0)
+                     (Amplitude 1)
+                     (Direction 0 1 0)
+   )
+
+   (Output FieldTime (Position 0 0 -0.5)
+                     (StartTime 0)
+                     (EndTime 200)
+                     (TimeStep  0.002)
+                     (FileName field_time_coupled.dat)
+                     (OutputField ey ex hz)
+   )
+
+   (Output FieldSpace (OutputField ex ey hz)
+                      (StartTime 50)
+                      (EndTime 50.1)
+                      (TimeStep 0.2)
+                      (FileName field_space)
+    )
+    // Build a source.
+    (Object Point (SourceName Source1) (Center 0 0 0.7) )
+
+    // Build one antenna.
+    (Object  Block (MaterialName metal)
+                   (Center -0.2 0 -0.5)
+                   (Axis0  1 0 0)
+                   (Axis1  0 1 0)
+                   (Axis2  0 0 1)
+                   (Size 0.05 0.7 0.05)
+    )
+    
+    (Object  Block (MaterialName metal)
+                   (Center 0.2 0 -0.5)
+                   (Axis0  1 0 0)
+                   (Axis1  0 1 0)
+                   (Axis2  0 0 1)
+                   (Size 0.05 0.8 0.05)
+    )
