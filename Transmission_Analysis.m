@@ -1,18 +1,13 @@
 clear all; close all; clc
 
-%% Load Ez data with and without the resonator
-% load Sim_large_no_ring_T6000_hx25.mat
-% load Sim_Ring_Nonlinear_T6000_hx25.mat
-
-% load Sim_small_no_ring.mat
-% load Sim_Ring_loss6_3e1.mat
+%%
 
 eps0 = 8.854e-12;  % vacuum permittivity in farad/L0
 mu0 = pi * 4e-7;  % vacuum permeability in henry/L0
 c = 1/sqrt(eps0*mu0);  % speed of light in vacuum in L0/sec
 L0 = 1e-6; 
 
-B = importdata('~/Documents/Fan/FDTD_PLUS/ref_signal.dat'); 
+B = importdata('~/Documents/Fan/FDTD_PLUS/signal_ref.dat'); 
 
 time_ref = B.data(:, 1); 
 % hz_ref = B.data(:, 2); 
@@ -21,9 +16,8 @@ time_ref = B.data(:, 1);
 
 clear B; 
 
-% B = importdata('field_time_coupled2.dat'); 
+%B = importdata('field_time_coupled2.dat'); 
 %B = importdata('field_time_center_ref.dat'); 
-
 B = importdata('~/Documents/Fan/FDTD_PLUS/signal.dat'); 
 
 time = B.data(:, 1); 
@@ -69,6 +63,20 @@ axis([10 5000 0 max(abs(Ex_ref_freq))])
 xlabel('Wavelength (nm)'); ylabel('Source'); 
 title('Source Spectrum');
 
+%% Grab the range from the spectral plot
+lowIndex = 10;
+highIndex = 5000;
+cutoff = max(abs(Ex_ref_freq))/100;
+for i = (1:length(Ex_ref_freq)-1)
+    if ((abs(Ex_ref_freq(i)) < cutoff) && (abs(Ex_ref_freq(i+1)) > cutoff))
+        lowIndex = i;
+    elseif ((abs(Ex_ref_freq(i)) > cutoff) && (abs(Ex_ref_freq(i+1)) < cutoff))
+        highIndex = i;
+    end
+end
+upperWvl = wvlens(lowIndex);
+lowerWvl = wvlens(highIndex);
+
 %% Calculate and plot transmission spectrum
 Transmission_small = abs(Ex_freq./Ex_ref_freq).^2; 
 
@@ -79,7 +87,7 @@ plot(wvlens, Transmission_small, 'r');
 % line([1000 2500], [1 1], 'Color', 'k'); 
 
 
-axis([ 800 1500 0 2000])
+axis([ lowerWvl upperWvl 0 max(Transmission_small(lowIndex:highIndex))])
 xlabel('Wavelength (nm)'); ylabel('|E(0,0,0)|^2'); 
 title('GOLD {3,1,7} L=300nm'); 
 
