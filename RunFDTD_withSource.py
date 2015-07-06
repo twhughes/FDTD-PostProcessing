@@ -3,7 +3,7 @@ from subprocess import call
 
 #define some convenience variables and functions
 run = True
-needsRef = True
+needsRef = True   #False only if you have the signal time data for these parameters
 
 x = '1 0 0'
 y = '0 1 0'
@@ -69,7 +69,7 @@ sourceDir = y
 sourceOffset = 8
 
 #with of source pulse (scaled time)
-sourceWidth = 1.0
+sourceWidth = 0.5
 
 #frequency of pulse modulation (scaled time)
 sourceFreq = 2.0
@@ -79,10 +79,10 @@ ws = [.05]           #thickness of dielectrics
 ts = [.05]           #thickness of metals
 hs = [.1]           #width of rods
 Ls = [.2]           #length of rods
-ds = [.1]            #center gap spacing
-epsList = [2,3,4]     #dielectric constants (from top to bottom [source above])
+ds = [0.05]            #center gap spacing
+epsList = [1,3,2]     #dielectric constants (from top to bottom [source above])
 
-metalType = 'PEC'   #'PEC' or 'gold'
+metalType = 'gold'   #'PEC' or 'gold'
 
 outputFields = 'ex ey hz'
 
@@ -299,8 +299,8 @@ for L in Ls:
                         os.chdir('/Users/twh/Documents/Fan/FDTD_PLUS/')
                         os.system('/usr/local/bin/mpirun -n 2 /Users/twh/Documents/Fan/FDTD_PLUS/maxwell_bloch/fdtd_plus_mpi ./ input.txt 2 1 1')
                         os.chdir('/Users/twh/Documents/Fan/PostProcessing')
-                        os.system('/Applications/MATLAB_R2014a.app/bin/matlab -nodesktop -r "addpath(genpath("~/Documents/Fan/PostProcessing"));"')
-                        os.system('/Applications/MATLAB_R2014a.app/bin/matlab -nodesktop -r "Transmission_Analysis"')
+       #                 os.system('/Applications/MATLAB_R2014a.app/bin/matlab -nodesktop -r "addpath(genpath("~/Documents/Fan/PostProcessing"));"')
+      #                  os.system('/Applications/MATLAB_R2014a.app/bin/matlab -nodesktop -r "Transmission_Analysis"')
     
     
     

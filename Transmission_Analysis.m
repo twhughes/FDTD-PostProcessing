@@ -41,11 +41,15 @@ end
 time = time / c * L0; 
 ht = time(2)-time(1); 
 
-%figure; plot(time*1e15, ey_ref); 
+figure(1);
+figHandle = figure(1);
+set(figHandle, 'Position', [100, 100, 1049, 895]);
+subplot(2,2,1);
+plot(time*1e15, ey_ref); 
 xlabel('Time (fs)'); ylabel('Ez(t)'); 
 title('Ez probe without ring (Small)'); 
-
-figure; plot(time*1e15, ey); 
+subplot(2,2,2);
+plot(time*1e15, ey); 
 xlabel('Time (fs)'); ylabel('Ez(t)'); 
 title('Ez probe with ring (Small)'); 
 
@@ -57,7 +61,7 @@ wvlens = c./freq*1e9;
 
 %% Plot the reference spectrum
 
-figure; 
+subplot(2,2,3);
 plot(wvlens, abs(Ex_ref_freq), 'k'); 
 axis([10 5000 0 max(abs(Ex_ref_freq))])
 xlabel('Wavelength (nm)'); ylabel('Source'); 
@@ -81,13 +85,13 @@ lowerWvl = wvlens(highIndex);
 Transmission_small = abs(Ex_freq./Ex_ref_freq).^2; 
 
 
-figure; 
+subplot(2,2,4);
 plot(wvlens, Transmission_small, 'r'); 
 
 % line([1000 2500], [1 1], 'Color', 'k'); 
 
 
-axis([ lowerWvl upperWvl 0 max(Transmission_small(lowIndex:highIndex))])
+axis([ lowerWvl upperWvl 0 max(Transmission_small(lowIndex:highIndex))+10])
 xlabel('Wavelength (nm)'); ylabel('|E(0,0,0)|^2'); 
 title('GOLD {3,1,7} L=300nm'); 
 
