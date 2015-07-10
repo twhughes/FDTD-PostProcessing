@@ -45,10 +45,10 @@ def getMaterial(eps, index):
 lengthScale = '0.000001'
 
 #grid size [x,y,z] (in units above)
-gridSize = [0.05, 0.05, 0.05]
+gridSize = [0.01, 0.01, 0.01]
 
 #total size of simulation domain
-totalSize = [2, 2, 2]
+totalSize = [3, 3, 2]
 
 #total time (scaled)
 totalTime = 200
@@ -69,17 +69,17 @@ sourceDir = y
 sourceOffset = 8
 
 #with of source pulse (scaled time)
-sourceWidth = 0.5
+sourceWidth = 2
 
 #frequency of pulse modulation (scaled time)
-sourceFreq = 2.0
+sourceFreq = 0.8
 
 
-ws = [.05]           #thickness of dielectrics
-ts = [.05]           #thickness of metals
+ws = [.1]           #thickness of dielectrics
+ts = [.1]           #thickness of metals
 hs = [.1]           #width of rods
-Ls = [.2]           #length of rods
-ds = [0.05]            #center gap spacing
+Ls = [.4]           #length of rods
+ds = [0.1]            #center gap spacing
 epsList = [1,3,2]     #dielectric constants (from top to bottom [source above])
 
 metalType = 'gold'   #'PEC' or 'gold'
@@ -87,7 +87,7 @@ metalType = 'gold'   #'PEC' or 'gold'
 outputFields = 'ex ey hz'
 
 measurePos = [0,0,0]  #
-timeDataOutFile = 'signal.dat'
+timeDataOutFile = 'signal5.dat'
 timeStep = 0.002
 
 fieldDataOutFile = 'fieldTime'
@@ -107,7 +107,7 @@ sourceInputString = """
                    )
                    (Option BoundaryParam  (Type pml pml pml) 
                                           (PmlParam (Type upml) (Size (X 0.5) (Y 0.5) (Z 0.5) )
-                                          			(SigmaFactor (X 0.375) (Y 0.375) (Z 0.375) ) )
+                                          			(SigmaFactor (X 0.075) (Y 0.075) (Z 0.075) ) )
                    )
                    (Option DimensionParam (LengthScale """ + str(lengthScale) + """)
                                           (Center 0 0 0)
@@ -217,7 +217,7 @@ for L in Ls:
                    )
                    (Option BoundaryParam  (Type pml pml pml) 
                                           (PmlParam (Type upml) (Size (X 0.5) (Y 0.5) (Z 0.5) )
-                                          			(SigmaFactor (X 0.375) (Y 0.375) (Z 0.375) ) )
+                                          			(SigmaFactor (X 0.075) (Y 0.075) (Z 0.075) ) )
                    )
                    (Option DimensionParam (LengthScale """ + str(lengthScale) + """)
                                           (Center 0 0 0)

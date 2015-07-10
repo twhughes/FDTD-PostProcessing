@@ -7,6 +7,8 @@ x = '1 0 0'
 y = '0 1 0'
 z = '0 0 1'
 
+reference = False
+
 #puts something in this form [a,b,c] to this form '( a b c )' for slurm
 def list2Str(list):
     string = ''
@@ -43,19 +45,20 @@ def getMaterial(eps, index):
 lengthScale = '0.000001'
 
 #grid size [x,y,z] (in units above)
-gridSize = [0.05, 0.05, 0.05]
+gridSize = [1.0, 1.0, 1.0]
 
+pmlSize = [10.0,10.0,10.0]
 #total size of simulation domain
-totalSize = [2, 2, 2]
+totalSize = [100, 100, 50]
 
 #total time (scaled)
-totalTime = 200
+totalTime = 5000
 
 #duration of source (in scaled time)
-sourceDuration = 200
+sourceDuration = 2000
 
 #position of source (point source) (x,y,z)
-sourcePos = [0.3,0,0]
+sourcePos = [-10.0,0,0]
 
 #amplitude of source (units?)
 sourceAmplitude = 1
@@ -64,38 +67,44 @@ sourceAmplitude = 1
 sourceDir = y
 
 #time offset of source
-sourceOffset = 8
+sourceOffset = 200
 
 #with of source pulse (scaled time)
-sourceWidth = 1.0
+sourceWidth = 50
 
 #frequency of pulse modulation (scaled time)
-sourceFreq = 2.0
+sourceFreq = 0.013
 
+substrate = False
 
-ws = [.05]           #thickness of dielectrics
-ts = [.05]           #thickness of metals
-hs = [.1]           #width of rods
-Ls = [.2]           #length of rods
-ds = [.1]            #center gap spacing
-epsList = [2,3,4]     #dielectric constants (from top to bottom [source above])
+subType = 'gold'   #'PEC' 'gold' 'dielx' where 'x' is the diel constant
 
-metalType = 'PEC'   #'PEC' or 'gold'
+ws = [4.0]           #thickness of dielectrics
+ts = [4.0]           #thickness of metals
+hs = [4.0]           #width of rods
+Ls = [10.0]           #length of rods
+ds = [4.0]            #center gap spacing
+epsList = [1,10,4]     #dielectric constants (from top to bottom [source above])
+
+metalType = 'gold'   #'PEC' or 'gold'
 
 outputFields = 'ex ey hz'
 
 measurePos = [0,0,0]  #
-timeDataOutFile = 'signal.dat'
-timeStep = 0.002
+timeDataOutFile = 'signal5.dat'
+timeStep = 0.0002
 
 fieldDataOutFile = 'fieldTime'
 fieldStartTime = 60
-fieldEndTime = 61
-fieldTimeStep = 0.002
+fieldEndTime = 100
+fieldTimeStep = 0.02
 
 #change directory to your FDTD Directory
 os.chdir('/Users/twh/Documents/Fan/FDTD_PLUS/')
 
+if (reference):
+    totalTime = sourceDuration
+    
 #loop through size parameters
 for L in Ls:
     for t in ts:
@@ -111,25 +120,34 @@ for L in Ls:
                 
                     xCenter = 0
                     yCenter = d/2 + L/2
+                    print d
+                    print L
+                    print yCenter
                     zCenter = 0
-                    for eps in epsList:
-                        materials += getMaterial(eps, index)
-                        matName = 'diel' + str(index)
+                    if (not reference):
+                        for eps in epsList:
+                            materials += getMaterial(eps, index)
+                            matName = 'diel' + str(index)
                         
+                            blocks += getBlock(metalType, [xCenter,  yCenter, zCenter], [t,L,h])
+                            blocks += getBlock(metalType, [xCenter, -yCenter, zCenter], [t,L,h])
+                        
+                            xCenter += t/2 + w/2
+                        
+                            blocks += getBlock(matName, [xCenter,  yCenter, zCenter], [w,L,h])
+                            blocks += getBlock(matName, [xCenter, -yCenter, zCenter], [w,L,h])
+                        
+                            xCenter += t/2 + w/2
+                    
+                            index += 1
                         blocks += getBlock(metalType, [xCenter,  yCenter, zCenter], [t,L,h])
                         blocks += getBlock(metalType, [xCenter, -yCenter, zCenter], [t,L,h])
                         
-                        xCenter += t/2 + w/2
-                        
-                        blocks += getBlock(matName, [xCenter,  yCenter, zCenter], [w,L,h])
-                        blocks += getBlock(matName, [xCenter, -yCenter, zCenter], [w,L,h])
-                        
-                        xCenter += t/2 + w/2
-                    
-                        index += 1
-                    blocks += getBlock(metalType, [xCenter,  yCenter, zCenter], [t,L,h])
-                    blocks += getBlock(metalType, [xCenter, -yCenter, zCenter], [t,L,h])
-                    
+                        #substrate
+                        if (substrate):
+                            blocks += getBlock(subType, [1/4*totalSize[0]+t/4+xCenter/2,0,0], [totalSize[0]/2 - t/2 - xCenter,totalSize[1],totalSize[2]])
+                    else:
+                        timeDataOutFile = 'signal_ref.dat'
                         
                     #open input file to write to
                     f = open('input.txt', 'w')
@@ -140,8 +158,8 @@ for L in Ls:
                                           (FieldType real)
                    )
                    (Option BoundaryParam  (Type pml pml pml) 
-                                          (PmlParam (Type upml) (Size (X 0.5) (Y 0.5) (Z 0.5) )
-                                          			(SigmaFactor (X 0.375) (Y 0.375) (Z 0.375) ) )
+                                          (PmlParam (Type upml) (Size (X """ + str(pmlSize[0]) + """) (Y """ + str(pmlSize[1]) + """) (Z """ + str(pmlSize[2]) + """) )
+                                          			(SigmaFactor (X """ + str(0.375*gridSize[0]*40/pmlSize[0]) + """) (Y """ + str(0.375*gridSize[1]*40/pmlSize[1]) + """) (Z """ + str(0.375*gridSize[2]*40/pmlSize[2]) + """) ) )
                    )
                    (Option DimensionParam (LengthScale """ + str(lengthScale) + """)
                                           (Center 0 0 0)
@@ -192,18 +210,23 @@ for L in Ls:
                                      (StartTime 0)
                                      (EndTime """ + str(totalTime) + """)
                                      (TimeStep  """ + str(timeStep) + """)
-                                     (FileName """ + timeDataOutFile+'L'+str(L)+'t'+str(t)+'w'+str(w)+'h'+str(h)+'d'+str(d) +  """)
+                                     (FileName """ + timeDataOutFile +  """)
                                      (OutputField """ + outputFields + """)
                    )
 
                    (Output FieldSpace (OutputField """ + outputFields + """)
-                                      (StartTime """ + str(fieldEndTime) + """)
-                                      (EndTime """ + str(fieldStartTime) + """)
+                                      (StartTime """ + str(fieldStartTime) + """)
+                                      (EndTime """ + str(fieldEndTime) + """)
                                       (TimeStep """ + str(fieldTimeStep) + """)
-                                      (FileName """ + fieldDataOutFile+'L'+str(L)+'t'+str(t)+'w'+str(w)+'h'+str(h)+'d'+str(d) + """)
+                                      (FileName """ + fieldDataOutFile + """)
                     )
                     // Build a source.
-                    (Object Point (SourceName Source1) (Center """ + list2Str(sourcePos) + """) 
+                    
+                    (Object Plane (Center   """ + list2Str(sourcePos) + """)
+                                  (SourceName Source1)
+                                  (Axis0    0 1 0)
+                                  (Axis1    0 0 1)
+                                  (Size     """ + str(totalSize[1] - pmlSize[1]*2) + """ """ + str(totalSize[2] - pmlSize[2]*2) + """)
                     )
 
                     """ + blocks + """
@@ -218,10 +241,12 @@ for L in Ls:
                     #call 'which mpirun' to get path to mpirun for all users
                     #also lets make path to FDTD_PLUS a global variable
                     #cruddy way to do this let's try subprocess.call() next time around
-                    #os.system('/usr/local/bin/mpirun -n 2 /Users/twh/Documents/Fan/FDTD_PLUS/maxwell_bloch/fdtd_plus_mpi ./ input.txt 2 1 1')
+                    os.system('/usr/local/bin/mpirun -n 4 /Users/twh/Documents/Fan/FDTD_PLUS/maxwell_bloch/fdtd_plus_mpi ./ input.txt 2 2 1')
+                    os.system('say "congradulations, Tyler.  your program has finished!"')
     
     
-    
+    #                    (Object Point (SourceName Source1) (Center """ + list2Str(sourcePos) + """) 
+     #               )
     
     
     

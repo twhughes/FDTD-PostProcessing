@@ -1,16 +1,16 @@
 clear all; close all; clc; 
 cd '~/Documents/Fan/FDTD_PLUS/';        % cd to the directory where the files are
-addpath(genpath('~/Documents/Fan/filesbrah'));
+addpath(genpath('~/Documents/Fan/FDTD_PLUS'));
 
 %% 
 % define parameters
 
-sweep = 'space';                         % sweep 'space' or 'time'
-filename = 'field_space_wide2.h5';      % field plots file name
+sweep = 'time';                         % sweep 'space' or 'time'
+filename = 'fieldTime.h5';               % field plots file name
 structFile = 'structure.h5';            % structure file name
 axis = 2;                               % {0,1,2} = {x,y,z}
-time = 2400;                            % time step (if doing space sweep) (must be present in field_space.h5)
-position = 40;                          % index of plane along axis (if doing time sweep)
+time = 2000;                            % time step (if doing space sweep) (must be present in field_space.h5)
+position = 25;                          % index of plane along axis (if doing time sweep)
 delay = 0.01;                           % movie frame delay time (sec)
 xrange = [-1.5 1.5];                    % xrange in your simulation
 yrange = [-1.5 1.5];                    % yrange in your simulation
@@ -100,7 +100,7 @@ if (strcmp(sweep,'space'))
             
             % plot the structure
             subplot(2,2,4)
-            visreal(permute(B(floor(i*bScale), :, :), [3 2 1]), xrange, yrange);
+            %visreal(permute(B(floor(i*bScale), :, :), [3 2 1]), xrange, yrange);
             xlabel('x');
             ylabel('y');
             title(strcat('Structure: z = ', num2str(i), ' (unit cells)')); 
